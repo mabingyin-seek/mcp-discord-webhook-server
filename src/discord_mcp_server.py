@@ -149,7 +149,12 @@ async def serve(
 def main():
     """主函数"""
     import asyncio
-    asyncio.run(serve())
+    import sys
+    if len(sys.argv) > 1 :
+        webhook_url = sys.argv[1]
+    else:
+        webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
+    asyncio.run(serve(webhook_url))
 
 if __name__ == "__main__":
     main()
