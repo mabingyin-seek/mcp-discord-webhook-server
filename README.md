@@ -15,10 +15,12 @@ pip install discord-mcp-server
 export DISCORD_WEBHOOK_URL="your-discord-webhook-url"
 ```
 
-2. 运行服务器：
-```bash
-discord-mcp
-```
+2. 运行服务器(cherry studio)：
+
+命令：uvx
+参数：discord-mcp-server@latest
+环境变量：DISCORD_WEBHOOK_URL=<your-discord-webhook-url>
+
 
 ## 环境变量
 
