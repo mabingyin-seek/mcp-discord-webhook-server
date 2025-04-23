@@ -1,6 +1,6 @@
 [project]
 name = "discord-mcp-server"
-version = "0.1.1"
+version = "0.1.3"
 description = "A Discord webhook server using MCP"
 authors = [
     {name = "mabingyin", email = "ma786074771@outlook.com"}
@@ -27,4 +27,4 @@ build-backend = "hatchling.build"
 packages = ["src"]
 
 [project.scripts]
-discord-mcp-server = "src.__main__:main"
+discord-mcp-server = "src.discord_mcp_server:main"
