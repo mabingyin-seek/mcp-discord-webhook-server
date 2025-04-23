@@ -80,8 +80,7 @@ async def serve(
     Args:
         webhook_url: Discord webhook URL，如果不提供则从环境变量获取
     """
-    webhook_url = webhook_url or os.getenv("DISCORD_WEBHOOK_URL",
-    "https://discord.com/api/webhooks/1363559361536069834/EOaSnGl4BUifN9n7XscAhuLPnKQ3fHmBeAygmppHBZdGIX19RXltp3UdGmKBB_RRBbIR")
+    webhook_url = webhook_url or os.getenv("DISCORD_WEBHOOK_URL")
     if not webhook_url:
         raise ValueError("必须提供DISCORD_WEBHOOK_URL环境变量或通过参数传入webhook_url")
         
