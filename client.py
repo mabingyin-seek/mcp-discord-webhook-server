@@ -1,16 +1,26 @@
 # 导入必要的模块和类型
 import asyncio
 import sys
+import os
 from mcp import ClientSession, StdioServerParameters, types
 from mcp.client.stdio import stdio_client
 
+# 设置 Windows 特定的事件循环策略
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+
+# 创建主事件循环
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+
+DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL", "https://discord.com/api/webhooks/1363559361536069834/EOaSnGl4BUifN9n7XscAhuLPnKQ3fHmBeAygmppHBZdGIX19RXltp3UdGmKBB_RRBbIR")
 
 # 创建标准输入输出服务器参数配置
 # 这些参数用于启动和管理与服务器的通信
 server_params = StdioServerParameters(
-    command="python",  # 使用 python 直接运行
-    args=["src/discord_mcp_server.py"],  # 传递脚本路径作为参数
-    env=None,  # 可选的环境变量设置
+    command="uvx",  # 使用 uvx 运行
+    args=["discord-mcp-server"],  # 传递脚本路径作为参数
+    env={"DISCORD_WEBHOOK_URL": DISCORD_WEBHOOK_URL},  # 环境变量设置
 )
 
 # 定义采样回调函数
@@ -51,8 +61,11 @@ async def run():
                 print("正在调用工具...")
                 result = await session.call_tool(
                     "send_message", 
-                    arguments={"msg_type": 'markdown', 
-                               "content": '# 今日黄金\n## 今日黄金价格1060元！'})
+                    arguments={
+                        "msg_type": 'markdown', 
+                        "content": '# 今日黄金\n## 今日黄金价格1060元！'
+                    }
+                )
                 print("工具调用结果:", result)
                 
             print("会话已关闭") # Session closed by context manager
@@ -62,19 +75,23 @@ async def run():
         print(f"客户端运行时出错: {str(e)}", file=sys.stderr)
         # 异常信息会在协程退出时打印
     finally:
-        # 清理由 async with 自动处理
+        # 确保所有资源都被正确清理
+        if 'session' in locals():
+            await session.close()
         print("客户端完成")
 
 # 程序入口点
 if __name__ == "__main__":
-    # 在 Windows 上，显式设置 ProactorEventLoop 策略可能有助于解决某些子进程问题
-    # 但如果标准 SelectorEventLoop 工作正常，则不需要
-    # if sys.platform == "win32":
-    #      asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
     try:
-        asyncio.run(run())
+        loop.run_until_complete(run())
     except KeyboardInterrupt:
         print("\n程序被用户中断")
     except Exception as e:
         # 捕获 asyncio.run 可能引发的顶层异常
         print(f"程序顶层运行出错: {str(e)}", file=sys.stderr)
+    finally:
+        # 清理事件循环
+        try:
+            loop.close()
+        except Exception:
+            pass
